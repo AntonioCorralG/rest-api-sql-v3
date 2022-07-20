@@ -50,10 +50,10 @@ module.exports = (sequelize) => {
   Course.associate = (models) => {
     // TODO Add associations.
     Course.belongsTo(models.User, {
-      as: 'user',
+    //   as: 'StudentId',
       foreignKey: {
-        fieldName: "useerId",
-        allowNull: false,
+        fieldName: "StudentId",
+        // allowNull: false,
       },
     });
   };
