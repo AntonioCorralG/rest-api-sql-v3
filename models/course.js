@@ -36,11 +36,9 @@ module.exports = (sequelize) => {
       },
       estimatedTime: {
         type: Sequelize.STRING,
-        // allowNull: false,
       },
       materialsNeeded: {
         type: Sequelize.STRING,
-        // allowNull: false,
       },
 
     },
@@ -48,12 +46,10 @@ module.exports = (sequelize) => {
   );
 
   Course.associate = (models) => {
-    // TODO Add associations.
+    // Adds associations.
     Course.belongsTo(models.User, {
-    //   as: 'StudentId',
       foreignKey: {
         fieldName: "userId",
-        // allowNull: false,
       },
     });
   };
