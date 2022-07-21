@@ -36,11 +36,11 @@ module.exports = (sequelize) => {
       },
       estimatedTime: {
         type: Sequelize.STRING,
-        allowNull: false,
+        // allowNull: false,
       },
       materialsNeeded: {
         type: Sequelize.STRING,
-        allowNull: false,
+        // allowNull: false,
       },
 
     },
@@ -52,7 +52,7 @@ module.exports = (sequelize) => {
     Course.belongsTo(models.User, {
     //   as: 'StudentId',
       foreignKey: {
-        fieldName: "StudentId",
+        fieldName: "userId",
         // allowNull: false,
       },
     });

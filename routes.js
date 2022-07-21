@@ -16,8 +16,14 @@ const { asyncHandler } = require('./middleware/async-handler');
 router.get(
   "/users", authenticateUser,
   asyncHandler(async (req, res) => {
-    let users = await User.findAll();
-    res.json(users);
+    
+    const user = req.currentUser;
+    res.json({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        emailAddress: user.emailAddress
+    });
   })
 );
 
@@ -27,7 +33,7 @@ router.post(
   asyncHandler(async (req, res) => {
     try {
       await User.create(req.body);
-      res.status(201).json({ message: "Account successfully created!" });
+      res.status(201).location('/').json({ message: "Account successfully created!" }).end();
     } catch (error) {
       console.log("ERROR: ", error.name);
 
@@ -46,19 +52,33 @@ router.post(
 
 //A /api/courses GET route that will return all courses including the User associated with each course and a 200 HTTP status code.
 router.get( "/courses", asyncHandler(async (req, res)=> {
-    let courses = await Course.findAll();
-    res.status(200).json(courses)
+    let courses = await Course.findAll( {
+        //includes the user in the course
+        include: [{
+            model: User,
+        }]
+    });
+    if (courses) {
+        res.status(200).json(courses);
+    } else {
+    res.status(404).json({ message: "No courses currently exist."})
+    }
 }))
 
 //A /api/courses/:id GET route that will return the corresponding course including the User associated with that course and a 200 HTTP status code.
 router.get('/courses/:id', asyncHandler(async (req, res) => {
-    const courses = await Course.findByPk(req.params.id);
-    if(courses) {
-      res.status(200).json(courses);      
+    const courses = await Course.findByPk(req.params.id, {
+        //includes the user in the course
+        include: [{
+            model: User,
+        }]
+    });
+    if (courses) {
+        res.status(200).json(courses);
     } else {
-      res.sendStatus(404).json( { message: "Unable to find course "} );
-    }
-  }));
+    res.status(404).json({ message: "Unable to find course."})
+    }  }));
+
 //A /api/courses POST route that will create a new course, set the Location header to the URI for the newly created course, and return a 201 HTTP status code and no content.
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
     let courses;
@@ -79,9 +99,9 @@ router.put('/courses/:id', authenticateUser, asyncHandler( async(req, res) => {
     try {
         const courses = await Course.findByPk(req.params.id);
         if (courses) {
-            /* update corresponding course */
+            //update corresponding course 
             await courses.update(req.body);
-            /* return 204 HTTP status code and no content */
+            //return 204 HTTP status code and no content
             res.status(204).end();
         } else {
             res.status(404).end();
@@ -100,9 +120,9 @@ router.put('/courses/:id', authenticateUser, asyncHandler( async(req, res) => {
 router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     const courses = await Course.findByPk(req.params.id);
     if (courses) {
-        /* delete corresponding course */
+        // delete corresponding course
         await courses.destroy();
-        /* return 204 HTTP status code and no content */
+        // return 204 HTTP status code and no content
         res.status(204).end();
     } else {
         res.status(404).json({ message: 'Unable to find course' });
